@@ -2,6 +2,7 @@
  * mouse.c -- mouse event management
  *
  * Copyright (c) 2013, 2014 David Demelier <markand@malikania.fr>
+ * Copyright (c) 2016 Webster Sheets <webster@web-eworks.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -20,6 +21,29 @@
 
 #include "mouse.h"
 #include "window.h"
+
+#if SDL_VERSION_ATLEAST(2, 0, 4)
+/*
+ * SDL.captureMouse(enabled)
+ *
+ * Arguments:
+ *	enabled enables or disables global mouse event capturing.
+ *
+ * Returns:
+ *	true on success, nil if not supported
+ *	an error message on failure
+ */
+static int
+l_captureMouse(lua_State *L)
+{
+	SDL_bool enabled = lua_toboolean(L, 1);
+
+	if (SDL_CaptureMouse(enabled) < 0)
+		return commonPushSDLError(L, 1);
+
+	return commonPush(L, "b", 1);
+}
+#endif
 
 /*
  * SDL.createColorCursor(s, x, y)
@@ -96,6 +120,29 @@ l_getCursor(lua_State *L)
 
 	return commonPush(L, "p", MouseCursorName, c);
 }
+
+#if SDL_VERSION_ATLEAST(2, 0, 4)
+/*
+ * SDL.getGlobalMouseState()
+ *
+ * Returns:
+ *	A table enum with buttons
+ */
+static int
+l_getGlobalMouseState(lua_State *L)
+{
+	int x, y;
+	Uint32 state;
+
+	state = SDL_GetGlobalMouseState(&x, &y);
+
+	commonPushEnum(L, state, MouseMask);
+	lua_pushinteger(L, x);
+	lua_pushinteger(L, y);
+
+	return 3;
+}
+#endif
 
 /*
  * SDL.getMouseFocus()
@@ -225,7 +272,30 @@ l_showCursor(lua_State *L)
 	return commonPush(L, "i", SDL_ShowCursor(toggle));
 }
 
+#if SDL_VERSION_ATLEAST(2, 0, 4)
+/*
+ * SDL.warpMouseGlobal(x, y)
+ *
+ * Arguments:
+ *	x the x
+ *	y the y
+ */
+static int
+l_warpMouseGlobal(lua_State *L)
+{
+	int x		= luaL_checkinteger(L, 1);
+	int y		= luaL_checkinteger(L, 2);
+
+	SDL_WarpMouseGlobal(x, y);
+
+	return 0;
+}
+#endif
+
 const luaL_Reg MouseFunctions[] = {
+#if SDL_VERSION_ATLEAST(2, 0, 4)
+	{ "captureMouse",		l_captureMouse		},
+#endif
 	{ "createColorCursor",		l_createColorCursor	},
 	{ "createCursor",		l_createCursor		},
 	{ "getCursor",			l_getCursor		},
@@ -236,6 +306,10 @@ const luaL_Reg MouseFunctions[] = {
 	{ "setCursor",			l_setCursor		},
 	{ "setRelativeMouseMode",	l_setRelativeMouseMode	},
 	{ "showCursor",			l_showCursor		},
+#if SDL_VERSION_ATLEAST(2, 0, 4)
+	{ "getGlobalMouseState",	l_getGlobalMouseState	},
+	{ "warpMouseGlobal",		l_warpMouseGlobal	},
+#endif
 	{ NULL,				NULL			}
 };
 
@@ -288,3 +362,16 @@ const CommonEnum MouseMask[] = {
 	{ "X2",				SDL_BUTTON_X2MASK	},
 	{ NULL,				-1			},
 };
+
+#if SDL_VERSION_ATLEAST(2, 0, 2)
+
+/*
+ * SDL.mouseClick
+ */
+const CommonEnum MouseClick[] = {
+	{ "Single", 			1	},
+	{ "Double",			2	},
+	{ NULL,				-1	}
+};
+
+#endif

@@ -1,17 +1,17 @@
 -- This file was automatically generated for the LuaDist project.
 
 package = "lua-sdl2"
-version = "2.0.3.4.0-1"
+version = "2.0.5.6.0-1"
 -- LuaDist source
 source = {
-  tag = "2.0.3.4.0-1",
+  tag = "2.0.5.6.0-1",
   url = "git://github.com/LuaDist-testing/lua-sdl2.git"
 }
 -- Original source
 -- source = {
---    url = "https://github.com/Tangent128/luasdl2/archive/v2.0.3-4.0.tar.gz",
+--    url = "https://github.com/Tangent128/luasdl2/archive/v2.0.5-6.0.tar.gz",
 --    md5 = "",
---    dir = "luasdl2-2.0.3-4.0"
+--    dir = "luasdl2-2.0.5-6.0"
 -- }
 description = {
    summary = "Lua-SDL2 is a pure C binding of SDL 2.0 for Lua 5.1, JIT, 5.2, and 5.3",
@@ -37,7 +37,7 @@ external_dependencies = {
    SDL2_ttf = {
       header = "SDL2/SDL_ttf.h"
    },
-   
+
    platforms = {
       windows = {
          SDL2 = {
@@ -149,16 +149,16 @@ build = {
             SDL = {
                incdirs = {"$(SDL2_INCDIR)", "src/", "extern/queue/", "./", "rocks/"}
             },
-            ["SDL_image"] = {
+            ["SDL.image"] = {
                incdirs = {"$(SDL2_INCDIR)", "src/", "extern/queue/", "./", "rocks/"}
             },
-            ["SDL_mixer"] = {
+            ["SDL.mixer"] = {
                incdirs = {"$(SDL2_INCDIR)", "src/", "extern/queue/", "./", "rocks/"}
             },
-            ["SDL_net"] = {
+            ["SDL.net"] = {
                incdirs = {"$(SDL2_INCDIR)", "src/", "extern/queue/", "./", "rocks/"}
             },
-            ["SDL_ttf"] = {
+            ["SDL.ttf"] = {
                incdirs = {"$(SDL2_INCDIR)", "src/", "extern/queue/", "./", "rocks/"}
             },
          }

@@ -3,6 +3,7 @@
  *
  * Copyright (c) 2013, 2014 David Demelier <markand@malikania.fr>
  * Copyright (c) 2014, 2015 Joseph Wallace <tangent128@gmail.com>
+ * Copyright (c) 2016 Webster Sheets <webster@web-eworks.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -202,7 +203,7 @@ l_getError(lua_State *L)
 static int
 l_setError(lua_State *L)
 {
-	SDL_SetError(luaL_checkstring(L, 1));
+	SDL_SetError("%s", luaL_checkstring(L, 1));
 
 	return 0;
 }
@@ -242,6 +243,31 @@ l_getHint(lua_State *L)
 
 	return 1;
 }
+
+#if SDL_VERSION_ATLEAST(2, 0, 5)
+/*
+ * SDL.getHintBoolean(name[, default])
+ *
+ * Get a hint as a boolean value.
+ * If the hint does not exist, returns the 'truthyness'
+ * of the 'default' argument.
+ *
+ * Arguments:
+ *	The name of the hint to query.
+ *	The default value to return if the hint does not exist.
+ *
+ * Returns:
+ *	The hint value as a boolean.
+ */
+static int
+l_getHintBoolean(lua_State *L)
+{
+	const char *name = luaL_checkstring(L, 1);
+	int val = lua_toboolean(L, 2);
+
+	return commonPush(L, "b", SDL_GetHintBoolean(name, val));
+}
+#endif
 
 /*
  * SDL.setHint(name, value)
@@ -284,6 +310,9 @@ static const luaL_Reg functions[] = {
 	{ "setError",		l_setError		},
 	{ "clearHints",		l_clearHints		},
 	{ "getHint",		l_getHint		},
+#if SDL_VERSION_ATLEAST(2, 0, 5)
+	{ "getHintBoolean",	l_getHintBoolean	},
+#endif
 	{ "setHint",		l_setHint		},
 	{ NULL,			NULL			}
 };
@@ -303,6 +332,7 @@ static const struct {
 	{ ChannelFunctions				},
 
 	/* Event group */
+	{ GamectlFunctions				},
 	{ JoystickFunctions				},
 	{ KeyboardFunctions				},
 	{ MouseFunctions				},
@@ -350,6 +380,13 @@ static const struct {
 
 	/* Joystick values */
 	{ "joyHat",		EventJoyHat			},
+#if SDL_VERSION_ATLEAST(2, 0, 4)
+	{ "joystickPowerLevel",	JoystickPowerLevels		},
+#endif
+
+	/* Game Controller values */
+	{ "controllerAxis",	GameCtlAxis			},
+	{ "controllerButton",	GameCtlButton			},
 
 	/* Keyboard */
 	{ "key",		KeyboardCodes			},
@@ -358,12 +395,18 @@ static const struct {
 
 	/* Window */
 	{ "window",		WindowFlags			},
+#if SDL_VERSION_ATLEAST(2, 0, 4)
+	{ "hitTestResult",	HitTestResults			},
+#endif
 
 	/* General */
 	{ "flags",		InitFlags			},
 
 	{ "mouseButton",	MouseButtons			},
 	{ "mouseMask",		MouseMask			},
+#if SDL_VERSION_ATLEAST(2, 0, 2)
+	{ "mouseClick",		MouseClick			},
+#endif
 	{ "event",		EventType			},
 	{ "eventAction",	EventAction			},
 	{ "eventWindow",	EventWindow			},
