@@ -46,7 +46,7 @@ l_texture_getAlphaMod(lua_State *L)
 }
 
 /*
- * Texture:getBlendMod()
+ * Texture:getBlendMode()
  *
  * Returns:
  *	The blend mod integer or nil on failure (SDL.blendMode)
@@ -146,7 +146,7 @@ l_texture_setAlphaMod(lua_State *L)
 }
 
 /*
- * Texture:setBlendMod(value)
+ * Texture:setBlendMode(value)
  *
  * Arguments:
  *	value the value (SDL.blendMode)
@@ -300,6 +300,7 @@ const CommonObject Texture = {
 const CommonEnum TextureAccess[] = {
 	{ "Static",			SDL_TEXTUREACCESS_STATIC	},
 	{ "Streaming",			SDL_TEXTUREACCESS_STREAMING	},
+	{ "Target",			SDL_TEXTUREACCESS_TARGET	},
 	{ NULL,				-1				}
 };
 

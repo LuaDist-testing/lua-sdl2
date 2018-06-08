@@ -431,10 +431,10 @@ l_renderer_drawLine(lua_State *L)
 }
 
 /*
- * Renderer:drawLines(lines)
+ * Renderer:drawLines(points)
  *
  * Arguments:
- *	lines a sequence of lines
+ *	points a sequence of points connected by lines
  *
  * Returns:
  *	True on success or false
@@ -445,14 +445,14 @@ l_renderer_drawLines(lua_State *L)
 {
 	SDL_Renderer *rd = commonGetAs(L, 1, RendererName, SDL_Renderer *);
 
-	Array lines;
+	Array points;
 	int ret;
 
-	if (videoGetLines(L, 2, &lines) < 0)
+	if (videoGetPoints(L, 2, &points) < 0)
 		return commonPushErrno(L, 1);
 
-	ret = SDL_RenderDrawLines(rd, lines.data, lines.length);
-	arrayFree(&lines);
+	ret = SDL_RenderDrawLines(rd, points.data, points.length);
+	arrayFree(&points);
 
 	if (ret < 0)
 		return commonPushSDLError(L, 1);
@@ -679,6 +679,26 @@ l_renderer_getViewport(lua_State *L)
 }
 
 /*
+ * Renderer:getLogicalSize()
+ *
+ * Returns:
+ *	w width
+ *	h height
+ */
+static int
+l_renderer_getLogicalSize(lua_State *L)
+{
+	SDL_Renderer *rd = commonGetAs(L, 1, RendererName, SDL_Renderer *);
+	int w, h;
+
+	SDL_RenderGetLogicalSize(rd, &w, &h);
+	commonPush(L, "i", w);
+	commonPush(L, "i", h);
+
+	return 2;
+}
+
+/*
  * Renderer:present()
  */
 static int
@@ -813,6 +833,30 @@ l_renderer_setViewport(lua_State *L)
 	return commonPush(L, "b", 1);
 }
 
+/*
+ * Renderer:setLogicalSize(w, h)
+ *
+ * Arguments:
+ *	w the width of the logical resolution
+ *	h the height of the logical resolution
+ *
+ * Returns:
+ *	True on success or nil on failure
+ *	The error message on failure
+ */
+static int
+l_renderer_setLogicalSize(lua_State *L)
+{
+	SDL_Renderer *rd = commonGetAs(L, 1, RendererName, SDL_Renderer *);
+	int w = luaL_checkinteger(L, 2);
+	int h = luaL_checkinteger(L, 3);
+
+	if (SDL_RenderSetLogicalSize(rd, w, h) < 0)
+		return commonPushSDLError(L, 1);
+
+	return commonPush(L, "b", 1);
+}
+
 /* --------------------------------------------------------
  * Renderer object metamethods
  * -------------------------------------------------------- */
@@ -888,12 +932,14 @@ static const luaL_Reg RendererMethods[] = {
 	{ "getDrawColor",		l_renderer_getDrawColor			},
 	{ "getInfo",			l_renderer_getInfo			},
 	{ "getViewport",		l_renderer_getViewport			},
+	{ "getLogicalSize",		l_renderer_getLogicalSize		},
 	{ "present",			l_renderer_present			},
 	{ "setClipRect",		l_renderer_setClipRect			},
 	{ "setDrawBlendMode",		l_renderer_setDrawBlendMode		},
 	{ "setDrawColor",		l_renderer_setDrawColor			},
 	{ "setTarget",			l_renderer_setTarget			},
 	{ "setViewport",		l_renderer_setViewport			},
+	{ "setLogicalSize",		l_renderer_setLogicalSize		},
 	{ NULL,				NULL					}
 };
 
