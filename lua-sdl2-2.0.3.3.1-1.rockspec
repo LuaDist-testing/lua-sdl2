@@ -1,17 +1,17 @@
 -- This file was automatically generated for the LuaDist project.
 
 package = "lua-sdl2"
-version = "2.0.3.3-1"
+version = "2.0.3.3.1-1"
 -- LuaDist source
 source = {
-  tag = "2.0.3.3-1",
+  tag = "2.0.3.3.1-1",
   url = "git://github.com/LuaDist-testing/lua-sdl2.git"
 }
 -- Original source
 -- source = {
---    url = "https://github.com/Tangent128/luasdl2/archive/v2.0.3-3.tar.gz",
---    md5 = "45b48f2c865a1cdd67a6e514d10b6b47",
---    dir = "luasdl2-2.0.3-3"
+--    url = "https://github.com/Tangent128/luasdl2/archive/v2.0.3-3.1.tar.gz",
+--    md5 = "a20a44836d637bb40e6212328185c357",
+--    dir = "luasdl2-2.0.3-3.1"
 -- }
 description = {
    summary = "Lua-SDL2 is a pure C binding of SDL 2.0 for Lua 5.1, JIT, 5.2, and 5.3",
@@ -24,15 +24,14 @@ dependencies = {}
 build = {
    type = "cmake",
    variables = {
+      
+      -- directly setting the header path to the LuaRocks-provided one
+      -- will build the library for the correct Lua version
+      WITH_LUAVER = "user",
+      LUA_INCLUDE_DIR = "$(LUA_INCDIR)",
+      
       CMAKE_INSTALL_PREFIX = "$(PREFIX)",
       LUA_LIBDIR = "$(LIBDIR)",
-      
-      -- the code actually doesn't care about WITH_LUAVER apart from
-      -- CMake's initial search for Lua header files, so directly setting
-      -- the header path to the LuaRocks-provided one will build the
-      -- library for the correct Lua version regardless of WITH_LUAVER
-      WITH_LUAVER = "51",
-      LUA_INCLUDE_DIR = "$(LUA_INCDIR)",
       
       WITH_DOCS = "Off",
       
@@ -43,3 +42,4 @@ build = {
       --WITH_IMAGE = "Off",
    },
 }
+

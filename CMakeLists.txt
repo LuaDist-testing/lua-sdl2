@@ -2,7 +2,7 @@
 # CMakeLists.txt -- build system for LuaSDL2
 #
 # Copyright (c) 2013, 2014 David Demelier <markand@malikania.fr>
-# Copyright (c) 2014 Joseph Wallace <tangent128@gmail.com>
+# Copyright (c) 2014, 2015 Joseph Wallace <tangent128@gmail.com>
 #
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -24,8 +24,9 @@ project(Lua-SDL2 C)
 set(MAJOR "2")
 set(MINOR "0")
 set(PATCH "3")
-set(BINDING "2")
-set(VERSION "${MAJOR}.${MINOR}.${PATCH}-${BINDING}")
+set(BINDING "3")
+set(BINDING_PATCH "1")
+set(VERSION "${MAJOR}.${MINOR}.${PATCH}-${BINDING}.${BINDING_PATCH}")
 
 set(CMAKE_MODULE_PATH "${Lua-SDL2_SOURCE_DIR}/cmake")
 
@@ -110,8 +111,14 @@ elseif (WITH_LUAVER MATCHES "JIT")
 	find_package(LuaJIT REQUIRED)
 	set(LUA_INCLUDES ${LUAJIT_INCLUDE_DIR})
 	set(LUA_LIBDIR "lib/lua/5.1" CACHE STRING "Lua C Module Install Path")
+elseif (WITH_LUAVER MATCHES "user")
+#	the source selects the right code based on the LUA_VERSION_NUM define,
+#	so if the builder just wants to directly point us at the headers and
+#	install location, that's all we need to know.
+	set(LUA_INCLUDES ${LUA_INCLUDE_DIR})
+	set(LUA_LIBDIR "lib/lua" CACHE STRING "Lua C Module Install Path")
 else ()
-	message(FATAL_ERROR "Unknown Lua version ${WITH_LUAVER}, must be 51, 52 or JIT")
+	message(FATAL_ERROR "Unknown Lua version ${WITH_LUAVER}, must be 51, 52, 53, JIT, or user")
 endif ()
 
 include_directories(
@@ -230,6 +237,6 @@ endif ()
 
 set(CPACK_SOURCE_PACKAGE_FILE_NAME "Lua-SDL2-${VERSION}-source")
 set(CPACK_SOURCE_GENERATOR "ZIP;TGZ")
-set(CPACK_SOURCE_IGNORE_FILES ".hg;_build_")
+set(CPACK_SOURCE_IGNORE_FILES ".hg;_build_;.git")
 
 include(CPack)
